@@ -11,6 +11,8 @@ GET  /files/uploads/...     Serve uploaded images (static)
 GET  /health                Health check
 """
 
+import json
+import os
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -105,6 +107,7 @@ async def detect(
     # ── Save upload to disk ───────────────────────────────────────────────
     uid = uuid.uuid4().hex[:10]
     suffix = Path(filename).suffix or ".jpg"
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     upload_path = UPLOAD_DIR / f"{uid}{suffix}"
     upload_path.write_bytes(content)
 
@@ -129,11 +132,7 @@ async def detect(
     result_filename = f"result{suffix}"
     _write_image(run_dir / result_filename, result.result_image)
 
-    # Store metadata for /api/results/{uid}
-    _save_meta(run_dir, uid, filename, suffix, result, lanes_only, visualize,
-               conf_thres, iou_thres)
-
-    # ── Save viz images ───────────────────────────────────────────────────
+    # ── Save viz images (before meta so urls are persisted) ───────────────
     viz_urls: dict[str, str] | None = None
     if visualize and result.viz_images:
         viz_dir = run_dir / "viz"
@@ -144,6 +143,10 @@ async def detect(
             fname = f"{step_name}{ext}"
             _write_image(viz_dir / fname, img)
             viz_urls[step_name] = f"/files/results/{uid}/viz/{fname}"
+
+    # Store metadata for /api/results/{uid}
+    _save_meta(run_dir, uid, filename, suffix, result, viz_urls, lanes_only,
+               visualize, conf_thres, iou_thres)
 
     return {
         "uid": uid,
@@ -163,13 +166,13 @@ async def detect(
 @app.get("/api/results")
 def list_results():
     """List all inference runs (newest first)."""
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     runs = []
     for d in sorted(RESULTS_DIR.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
         if d.is_dir():
             meta_path = d / "meta.json"
             if meta_path.exists():
-                import json
-                runs.append(json.loads(meta_path.read_text()))
+                runs.append(json.loads(meta_path.read_text(encoding="utf-8")))
             else:
                 runs.append({"uid": d.name})
     return runs
@@ -178,11 +181,38 @@ def list_results():
 @app.get("/api/results/{uid}")
 def get_result(uid: str):
     """Get metadata for a single run."""
-    import json
     meta_path = RESULTS_DIR / uid / "meta.json"
     if not meta_path.exists():
         raise HTTPException(status_code=404, detail="Run not found.")
-    return json.loads(meta_path.read_text())
+    return json.loads(meta_path.read_text(encoding="utf-8"))
+
+
+@app.delete("/api/results/{uid}", status_code=204)
+def delete_result(uid: str):
+    """Delete all files for a single run (result images, viz, upload, meta)."""
+    import shutil
+    import stat
+
+    run_dir = RESULTS_DIR / uid
+    if not run_dir.exists():
+        raise HTTPException(status_code=404, detail="Run not found.")
+
+    def _force_remove(func, path, _exc_info):
+        # On Windows, files may be read-only; chmod before retry.
+        try:
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        except Exception:
+            pass  # best-effort
+
+    shutil.rmtree(run_dir, onerror=_force_remove)
+
+    # Also remove the upload file if it still exists
+    for upload_file in UPLOAD_DIR.glob(f"{uid}.*"):
+        try:
+            upload_file.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 # ---------------------------------------------------------------------------
@@ -191,17 +221,20 @@ def get_result(uid: str):
 
 def _save_meta(run_dir: Path, uid: str, filename: str | None,
                suffix: str, result: InferenceResult,
+               viz_urls: dict[str, str] | None,
                lanes_only: bool, visualize: bool,
                conf_thres: float, iou_thres: float) -> None:
-    import json
+    from datetime import datetime, timezone
     meta = {
         "uid": uid,
         "filename": filename,
+        "processed_at": datetime.now(timezone.utc).isoformat(),
         "upload_url": f"/files/uploads/{uid}{suffix}",
         "result_url": f"/files/results/{uid}/result{suffix}",
         "original_size": {"w": result.original_size[0], "h": result.original_size[1]},
         "inf_time_ms": round(result.inf_time_ms, 2),
         "nms_time_ms": round(result.nms_time_ms, 2),
+        "viz_urls": viz_urls,
         "options": {
             "lanes_only": lanes_only,
             "visualize": visualize,
@@ -213,4 +246,4 @@ def _save_meta(run_dir: Path, uid: str, filename: str | None,
             for d in result.detections
         ],
     }
-    (run_dir / "meta.json").write_text(json.dumps(meta, indent=2))
+    (run_dir / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")

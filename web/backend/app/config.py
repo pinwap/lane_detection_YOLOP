@@ -11,8 +11,8 @@ SOURCE_PATH = PROJECT_ROOT / "source"
 UPLOAD_DIR = BACKEND_ROOT / "uploads"
 RESULTS_DIR = BACKEND_ROOT / "results"
 
-UPLOAD_DIR.mkdir(exist_ok=True)
-RESULTS_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Model constants — must match the traced model's fixed input shape
 IMG_SIZE = 640           # letterbox target (width)

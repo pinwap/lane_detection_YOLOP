@@ -20,6 +20,20 @@ interface DetectResponse {
   viz_urls: Record<string, string> | null;
 }
 
+// Matches what GET /api/results returns (meta.json shape)
+interface HistoryItem {
+  uid: string;
+  filename: string;
+  processed_at?: string;
+  upload_url: string;
+  result_url: string;
+  original_size: { w: number; h: number };
+  inf_time_ms: number;
+  nms_time_ms: number;
+  detections: Detection[];
+  viz_urls: Record<string, string> | null;
+}
+
 const API = "";
 
 const VIZ_LABELS: Record<string, string> = {
@@ -43,9 +57,30 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [vizOpen, setVizOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [lightbox, setLightbox] = useState<{ images: { src: string; label: string }[]; idx: number } | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+
+  // Lightbox helpers
+  const openLightbox = (images: { src: string; label: string }[], idx: number) =>
+    setLightbox({ images, idx });
+  const closeLightbox = () => setLightbox(null);
+  const lbPrev = () => setLightbox((lb) => lb && ({ ...lb, idx: (lb.idx - 1 + lb.images.length) % lb.images.length }));
+  const lbNext = () => setLightbox((lb) => lb && ({ ...lb, idx: (lb.idx + 1) % lb.images.length }));
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") lbPrev();
+      else if (e.key === "ArrowRight") lbNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox]);
 
   // cleanup preview URL on unmount
   useEffect(() => {
@@ -53,6 +88,25 @@ function App() {
       if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
+
+  const fetchHistory = async () => {
+    try {
+      const res = await fetch(`${API}/api/results`);
+      if (res.ok) setHistory(await res.json());
+    } catch {
+      // silently ignore — history is non-critical
+    }
+  };
+
+  const deleteHistoryItem = async (uid: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await fetch(`${API}/api/results/${uid}`, { method: "DELETE" });
+    if (result?.uid === uid) setResult(null);
+    fetchHistory();
+  };
+
+  // Load history from backend on mount
+  useEffect(() => { fetchHistory(); }, []);
 
   const loadFile = useCallback((f: File) => {
     if (!f.type.startsWith("image/")) {
@@ -104,6 +158,7 @@ function App() {
       const data: DetectResponse = await res.json();
       setResult(data);
       setVizOpen(false);
+      fetchHistory();
       setTimeout(
         () =>
           resultRef.current?.scrollIntoView({
@@ -120,6 +175,17 @@ function App() {
   };
 
   const vizEntries = result?.viz_urls ? Object.entries(result.viz_urls) : [];
+
+  // Build the full image list for the lightbox when viewing a result
+  const resultLightboxImages = result
+    ? [
+        { src: `${API}${result.result_url}`, label: "Final result" },
+        ...vizEntries.map(([key, url]) => ({
+          src: `${API}${url}`,
+          label: VIZ_LABELS[key] ?? key.replace(/_/g, " "),
+        })),
+      ]
+    : [];
 
   return (
     <div className="app">
@@ -169,7 +235,9 @@ function App() {
 
       {/* ── Main grid ──────────────────────────────────────────────── */}
       <main className="main-grid">
-        {/* ── LEFT: Upload panel ──────────────────────────────────── */}
+        {/* ── LEFT column ─────────────────────────────────────────── */}
+        <div className="left-col">
+        {/* ── Upload panel ────────────────────────────────────────── */}
         <section className="panel panel-left">
           <div className="panel-title">
             <span className="panel-number">01</span>
@@ -193,7 +261,12 @@ function App() {
           >
             {preview ? (
               <>
-                <img src={preview} alt="Preview" className="preview-img" />
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="preview-img lb-trigger"
+                  onClick={(e) => { e.stopPropagation(); openLightbox([{ src: preview, label: "Upload preview" }], 0); }}
+                />
                 <div className="preview-overlay">
                   <button
                     className="overlay-btn"
@@ -361,6 +434,80 @@ function App() {
           )}
         </section>
 
+        {/* ── Recent files panel ──────────────────────────────────── */}
+        <section className="panel panel-history">
+          <div className="panel-title">
+            <span className="panel-number">REC</span>
+            <h2>Recent Files</h2>
+            {history.length > 0 && (
+              <span className="history-count">{history.length}</span>
+            )}
+          </div>
+
+          {history.length === 0 ? (
+            <div className="history-empty">
+              <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="1.5" strokeOpacity=".4" />
+                <path d="M16 10v6l3.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeOpacity=".5" />
+              </svg>
+              <span>No files processed yet</span>
+            </div>
+          ) : (
+            <ul className="history-list">
+              {history.map((item) => {
+                const loadItem = () => {
+                  setResult({
+                    uid: item.uid,
+                    upload_url: item.upload_url,
+                    result_url: item.result_url,
+                    original_size: item.original_size,
+                    inf_time_ms: item.inf_time_ms,
+                    nms_time_ms: item.nms_time_ms,
+                    detections: item.detections,
+                    viz_urls: item.viz_urls,
+                  });
+                  setVizOpen(false);
+                };
+                return (
+                  <li
+                    key={item.uid}
+                    className={`history-item${result?.uid === item.uid ? " active" : ""}`}
+                    onClick={loadItem}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && loadItem()}
+                  >
+                    <div className="history-thumb">
+                      <img src={`${API}${item.result_url}`} alt={item.filename} loading="lazy" />
+                    </div>
+                    <div className="history-info">
+                      <span className="history-name" title={item.filename}>{item.filename}</span>
+                      <span className="history-meta">
+                        {item.inf_time_ms.toFixed(0)} ms
+                      </span>
+                      <span className="history-time">
+                        {item.processed_at
+                          ? new Date(item.processed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+                          : "—"}
+                      </span>
+                    </div>
+                    <button
+                      className="history-delete"
+                      aria-label="Delete"
+                      onClick={(e) => deleteHistoryItem(item.uid, e)}
+                    >
+                      <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M2 3.5h10M5.5 3.5V2.5h3v1M3.5 3.5l.75 8h5.5l.75-8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+        </div>{/* end left-col */}
+
         {/* ── RIGHT: Result panel ─────────────────────────────────── */}
         <section className="panel panel-right" ref={resultRef}>
           <div className="panel-title">
@@ -384,11 +531,7 @@ function App() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  {(result.inf_time_ms + result.nms_time_ms).toFixed(0)} ms
-                </span>
-                <span className="badge badge-det">
-                  {result.detections.length} detection
-                  {result.detections.length !== 1 ? "s" : ""}
+                  {result.inf_time_ms.toFixed(0)} ms
                 </span>
               </div>
             )}
@@ -400,7 +543,8 @@ function App() {
                 <img
                   src={`${API}${result.result_url}`}
                   alt="Lane detection result"
-                  className="result-img"
+                  className="result-img lb-trigger"
+                  onClick={() => openLightbox(resultLightboxImages, 0)}
                 />
                 <div className="result-img-badge">
                   {result.original_size.w} × {result.original_size.h}
@@ -413,20 +557,6 @@ function App() {
                   <span className="timing-label">Inference</span>
                   <span className="timing-val">
                     {result.inf_time_ms.toFixed(1)} ms
-                  </span>
-                </div>
-                <div className="timing-divider" />
-                <div className="timing-item">
-                  <span className="timing-label">NMS</span>
-                  <span className="timing-val">
-                    {result.nms_time_ms.toFixed(1)} ms
-                  </span>
-                </div>
-                <div className="timing-divider" />
-                <div className="timing-item">
-                  <span className="timing-label">Total</span>
-                  <span className="timing-val">
-                    {(result.inf_time_ms + result.nms_time_ms).toFixed(1)} ms
                   </span>
                 </div>
               </div>
@@ -459,9 +589,15 @@ function App() {
 
                   {vizOpen && (
                     <div className="viz-grid">
-                      {vizEntries.map(([key, url]) => (
+                      {vizEntries.map(([key, url], i) => (
                         <div className="viz-card" key={key}>
-                          <img src={`${API}${url}`} alt={key} loading="lazy" />
+                          <img
+                            src={`${API}${url}`}
+                            alt={key}
+                            loading="lazy"
+                            className="lb-trigger"
+                            onClick={() => openLightbox(resultLightboxImages, i + 1)}
+                          />
                           <span className="viz-label">
                             {VIZ_LABELS[key] ?? key.replace(/_/g, " ")}
                           </span>
@@ -534,6 +670,46 @@ function App() {
       <footer className="footer">
         YOLOPv2 Lane Detection · powered by FastAPI + React
       </footer>
+
+      {/* ── Lightbox ───────────────────────────────────────────────── */}
+      {lightbox && (
+        <div className="lb-overlay" onClick={closeLightbox} role="dialog" aria-modal="true">
+          {/* Prev */}
+          {lightbox.images.length > 1 && (
+            <button className="lb-arrow lb-arrow-prev" onClick={(e) => { e.stopPropagation(); lbPrev(); }} aria-label="Previous">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          )}
+
+          {/* Image */}
+          <div className="lb-content" onClick={(e) => e.stopPropagation()}>
+            <img
+              key={lightbox.images[lightbox.idx].src}
+              src={lightbox.images[lightbox.idx].src}
+              alt={lightbox.images[lightbox.idx].label}
+              className="lb-img"
+            />
+            <div className="lb-footer">
+              <span className="lb-label">{lightbox.images[lightbox.idx].label}</span>
+              {lightbox.images.length > 1 && (
+                <span className="lb-counter">{lightbox.idx + 1} / {lightbox.images.length}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Next */}
+          {lightbox.images.length > 1 && (
+            <button className="lb-arrow lb-arrow-next" onClick={(e) => { e.stopPropagation(); lbNext(); }} aria-label="Next">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          )}
+
+          {/* Close */}
+          <button className="lb-close" onClick={closeLightbox} aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
