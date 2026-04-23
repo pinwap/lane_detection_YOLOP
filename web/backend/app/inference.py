@@ -108,14 +108,15 @@ class YOLOPv2:
         visualize: bool = False,
         conf_thres: float = 0.3,
         iou_thres: float = 0.45,
+        lane_thres: float = 0.5,
         classes: list[int] | None = None,
     ) -> InferenceResult:
         with torch.no_grad():
-            return self._run(orig, lanes_only, visualize, conf_thres, iou_thres, classes)
+            return self._run(orig, lanes_only, visualize, conf_thres, iou_thres, lane_thres, classes)
 
     # ------------------------------------------------------------------
 
-    def _run(self, orig, lanes_only, visualize, conf_thres, iou_thres, classes):
+    def _run(self, orig, lanes_only, visualize, conf_thres, iou_thres, lane_thres, classes):
         viz: dict[str, np.ndarray] = {}
 
         # ── Step 00 ─────────────────────────────────────────────────────
@@ -173,7 +174,7 @@ class YOLOPv2:
         # Post-process segmentation: crop head/foot padding, upsample ×2,
         # argmax/round → binary masks at 720×1280 (work-canvas resolution)
         da_mask_raw = driving_area_mask(seg)
-        ll_mask_raw = lane_line_mask(ll)
+        ll_mask_raw = lane_line_mask(ll, lane_thres=lane_thres)
         if visualize:
             viz["06_da_mask"] = _mask_to_image(da_mask_raw)
             viz["07_ll_mask"] = _mask_to_image(ll_mask_raw)

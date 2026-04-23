@@ -1,0 +1,68 @@
+{
+  "uid": "b54306f346",
+  "filename": "test10.jpeg",
+  "processed_at": "2026-04-23T11:41:53.911716+00:00",
+  "upload_url": "/files/uploads/b54306f346.jpeg",
+  "result_url": "/files/results/b54306f346/result.jpeg",
+  "original_size": {
+    "w": 3024,
+    "h": 4032
+  },
+  "inf_time_ms": 528.83,
+  "nms_time_ms": 2.11,
+  "viz_urls": {
+    "00_original": "/files/results/b54306f346/viz/00_original.jpg",
+    "01_work_canvas": "/files/results/b54306f346/viz/01_work_canvas.jpg",
+    "02_letterboxed": "/files/results/b54306f346/viz/02_letterboxed.jpg",
+    "03_tensor_ch0": "/files/results/b54306f346/viz/03_tensor_ch0.jpg",
+    "04_seg_raw": "/files/results/b54306f346/viz/04_seg_raw.jpg",
+    "05_ll_raw": "/files/results/b54306f346/viz/05_ll_raw.jpg",
+    "06_da_mask": "/files/results/b54306f346/viz/06_da_mask.png",
+    "07_ll_mask": "/files/results/b54306f346/viz/07_ll_mask.png",
+    "08_da_mask_orig": "/files/results/b54306f346/viz/08_da_mask_orig.png",
+    "09_ll_mask_orig": "/files/results/b54306f346/viz/09_ll_mask_orig.png",
+    "10_detections_raw": "/files/results/b54306f346/viz/10_detections_raw.jpg",
+    "11_overlay_da": "/files/results/b54306f346/viz/11_overlay_da.jpg",
+    "12_overlay_ll": "/files/results/b54306f346/viz/12_overlay_ll.jpg",
+    "13_overlay_boxes": "/files/results/b54306f346/viz/13_overlay_boxes.jpg",
+    "14_final": "/files/results/b54306f346/viz/14_final.jpg"
+  },
+  "options": {
+    "lanes_only": true,
+    "visualize": true,
+    "conf_thres": 0.3,
+    "iou_thres": 0.45
+  },
+  "detections": [
+    {
+      "bbox": [
+        0.0,
+        1939.0,
+        0.0,
+        2257.0
+      ],
+      "conf": 0.7664,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        3024.0,
+        1831.0,
+        3024.0,
+        2145.0
+      ],
+      "conf": 0.7126,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        2041.0,
+        0.0,
+        2146.0
+      ],
+      "conf": 0.6617,
+      "cls": 3
+    }
+  ]
+}

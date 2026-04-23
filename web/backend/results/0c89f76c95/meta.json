@@ -1,0 +1,78 @@
+{
+  "uid": "0c89f76c95",
+  "filename": "test04.jpeg",
+  "processed_at": "2026-04-23T11:38:52.777827+00:00",
+  "upload_url": "/files/uploads/0c89f76c95.jpeg",
+  "result_url": "/files/results/0c89f76c95/result.jpeg",
+  "original_size": {
+    "w": 4032,
+    "h": 3024
+  },
+  "inf_time_ms": 468.59,
+  "nms_time_ms": 0.62,
+  "viz_urls": {
+    "00_original": "/files/results/0c89f76c95/viz/00_original.jpg",
+    "01_work_canvas": "/files/results/0c89f76c95/viz/01_work_canvas.jpg",
+    "02_letterboxed": "/files/results/0c89f76c95/viz/02_letterboxed.jpg",
+    "03_tensor_ch0": "/files/results/0c89f76c95/viz/03_tensor_ch0.jpg",
+    "04_seg_raw": "/files/results/0c89f76c95/viz/04_seg_raw.jpg",
+    "05_ll_raw": "/files/results/0c89f76c95/viz/05_ll_raw.jpg",
+    "06_da_mask": "/files/results/0c89f76c95/viz/06_da_mask.png",
+    "07_ll_mask": "/files/results/0c89f76c95/viz/07_ll_mask.png",
+    "08_da_mask_orig": "/files/results/0c89f76c95/viz/08_da_mask_orig.png",
+    "09_ll_mask_orig": "/files/results/0c89f76c95/viz/09_ll_mask_orig.png",
+    "10_detections_raw": "/files/results/0c89f76c95/viz/10_detections_raw.jpg",
+    "11_overlay_da": "/files/results/0c89f76c95/viz/11_overlay_da.jpg",
+    "12_overlay_ll": "/files/results/0c89f76c95/viz/12_overlay_ll.jpg",
+    "13_overlay_boxes": "/files/results/0c89f76c95/viz/13_overlay_boxes.jpg",
+    "14_final": "/files/results/0c89f76c95/viz/14_final.jpg"
+  },
+  "options": {
+    "lanes_only": true,
+    "visualize": true,
+    "conf_thres": 0.3,
+    "iou_thres": 0.45
+  },
+  "detections": [
+    {
+      "bbox": [
+        0.0,
+        1331.0,
+        521.0,
+        2352.0
+      ],
+      "conf": 0.9478,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        1314.0,
+        697.0,
+        1908.0
+      ],
+      "conf": 0.9285,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        2825.0,
+        1087.0,
+        4032.0,
+        1961.0
+      ],
+      "conf": 0.8155,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        574.0,
+        1409.0,
+        717.0,
+        1676.0
+      ],
+      "conf": 0.4681,
+      "cls": 3
+    }
+  ]
+}

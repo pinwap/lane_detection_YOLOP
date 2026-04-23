@@ -62,6 +62,38 @@
 
 .logo-accent { color: var(--accent-dark); }
 
+/* ── Nav tabs ─────────────────────────────────────────────────────────────── */
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--accent-faint);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.nav-tab {
+  padding: 5px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.nav-tab:hover { color: var(--text-2); }
+
+.nav-tab.active {
+  background: #fff;
+  color: var(--accent-dark);
+  box-shadow: 0 1px 4px rgba(45,160,200,.12);
+}
+
 .header-badge {
   font-size: 11px;
   font-weight: 600;

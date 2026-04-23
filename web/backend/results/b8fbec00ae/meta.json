@@ -1,0 +1,98 @@
+{
+  "uid": "b8fbec00ae",
+  "filename": "test07.jpeg",
+  "processed_at": "2026-04-23T11:39:28.278947+00:00",
+  "upload_url": "/files/uploads/b8fbec00ae.jpeg",
+  "result_url": "/files/results/b8fbec00ae/result.jpeg",
+  "original_size": {
+    "w": 3024,
+    "h": 4032
+  },
+  "inf_time_ms": 396.06,
+  "nms_time_ms": 2.02,
+  "viz_urls": {
+    "00_original": "/files/results/b8fbec00ae/viz/00_original.jpg",
+    "01_work_canvas": "/files/results/b8fbec00ae/viz/01_work_canvas.jpg",
+    "02_letterboxed": "/files/results/b8fbec00ae/viz/02_letterboxed.jpg",
+    "03_tensor_ch0": "/files/results/b8fbec00ae/viz/03_tensor_ch0.jpg",
+    "04_seg_raw": "/files/results/b8fbec00ae/viz/04_seg_raw.jpg",
+    "05_ll_raw": "/files/results/b8fbec00ae/viz/05_ll_raw.jpg",
+    "06_da_mask": "/files/results/b8fbec00ae/viz/06_da_mask.png",
+    "07_ll_mask": "/files/results/b8fbec00ae/viz/07_ll_mask.png",
+    "08_da_mask_orig": "/files/results/b8fbec00ae/viz/08_da_mask_orig.png",
+    "09_ll_mask_orig": "/files/results/b8fbec00ae/viz/09_ll_mask_orig.png",
+    "10_detections_raw": "/files/results/b8fbec00ae/viz/10_detections_raw.jpg",
+    "11_overlay_da": "/files/results/b8fbec00ae/viz/11_overlay_da.jpg",
+    "12_overlay_ll": "/files/results/b8fbec00ae/viz/12_overlay_ll.jpg",
+    "13_overlay_boxes": "/files/results/b8fbec00ae/viz/13_overlay_boxes.jpg",
+    "14_final": "/files/results/b8fbec00ae/viz/14_final.jpg"
+  },
+  "options": {
+    "lanes_only": true,
+    "visualize": true,
+    "conf_thres": 0.3,
+    "iou_thres": 0.45
+  },
+  "detections": [
+    {
+      "bbox": [
+        2489.0,
+        2242.0,
+        3024.0,
+        2563.0
+      ],
+      "conf": 0.9103,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        22.0,
+        2232.0,
+        452.0,
+        2393.0
+      ],
+      "conf": 0.8,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        2213.0,
+        2245.0,
+        2363.0,
+        2345.0
+      ],
+      "conf": 0.555,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        849.0,
+        2259.0,
+        975.0,
+        2338.0
+      ],
+      "conf": 0.4326,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        2352.0,
+        2255.0,
+        2422.0,
+        2329.0
+      ],
+      "conf": 0.4094,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        2462.0,
+        2279.0,
+        2613.0,
+        2508.0
+      ],
+      "conf": 0.3939,
+      "cls": 3
+    }
+  ]
+}

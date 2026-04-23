@@ -90,6 +90,7 @@ async def detect(
     visualize: bool = Query(False, description="Save every intermediate pipeline step to viz/"),
     conf_thres: float = Query(0.3, ge=0.0, le=1.0, description="Object confidence threshold"),
     iou_thres: float = Query(0.45, ge=0.0, le=1.0, description="NMS IoU threshold"),
+    lane_thres: float = Query(0.5, ge=0.0, le=1.0, description="Lane mask probability threshold"),
 ):
     """
     Send raw image binary as the request body (Content-Type: application/octet-stream).
@@ -124,6 +125,7 @@ async def detect(
         visualize=visualize,
         conf_thres=conf_thres,
         iou_thres=iou_thres,
+        lane_thres=lane_thres,
     )
 
     # ── Save result image ─────────────────────────────────────────────────
@@ -146,7 +148,7 @@ async def detect(
 
     # Store metadata for /api/results/{uid}
     _save_meta(run_dir, uid, filename, suffix, result, viz_urls, lanes_only,
-               visualize, conf_thres, iou_thres)
+               visualize, conf_thres, iou_thres, lane_thres)
 
     return {
         "uid": uid,
@@ -223,7 +225,8 @@ def _save_meta(run_dir: Path, uid: str, filename: str | None,
                suffix: str, result: InferenceResult,
                viz_urls: dict[str, str] | None,
                lanes_only: bool, visualize: bool,
-               conf_thres: float, iou_thres: float) -> None:
+               conf_thres: float, iou_thres: float,
+               lane_thres: float) -> None:
     from datetime import datetime, timezone
     meta = {
         "uid": uid,
@@ -240,6 +243,7 @@ def _save_meta(run_dir: Path, uid: str, filename: str | None,
             "visualize": visualize,
             "conf_thres": conf_thres,
             "iou_thres": iou_thres,
+            "lane_thres": lane_thres,
         },
         "detections": [
             {"bbox": d.bbox, "conf": round(d.conf, 4), "cls": d.cls}

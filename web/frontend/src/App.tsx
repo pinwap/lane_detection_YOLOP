@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, type CSSProperties } from "react";
 import "./App.css";
+import EvalPage from "./EvalPage";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -49,6 +50,8 @@ const VIZ_LABELS: Record<string, string> = {
 // ── App ──────────────────────────────────────────────────────────────────────
 
 function App() {
+  const [page, setPage] = useState<"detect" | "eval">("detect");
+
   // state
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -59,6 +62,7 @@ function App() {
   const [dragging, setDragging] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [lightbox, setLightbox] = useState<{ images: { src: string; label: string }[]; idx: number } | null>(null);
+  const [laneThres, setLaneThres] = useState(0.5);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -139,11 +143,13 @@ function App() {
         filename: file.name,
         lanes_only: "true",
         visualize: "true",
+        lane_thres: laneThres.toFixed(2),
       });
       console.log("[detect] params sent to backend →", {
         filename: file.name,
         lanes_only: true,
         visualize: true,
+        lane_thres: laneThres,
         url: `${API}/api/detect?${params}`,
       });
       const res = await fetch(`${API}/api/detect?${params}`, {
@@ -229,12 +235,29 @@ function App() {
               Lane<span className="logo-accent">Vision</span>
             </span>
           </div>
+          <nav className="header-nav">
+            <button
+              className={`nav-tab${page === "detect" ? " active" : ""}`}
+              onClick={() => setPage("detect")}
+            >
+              Detect
+            </button>
+            <button
+              className={`nav-tab${page === "eval" ? " active" : ""}`}
+              onClick={() => setPage("eval")}
+            >
+              Evaluation
+            </button>
+          </nav>
           <div className="header-badge">YOLOPv2</div>
         </div>
       </header>
 
+      {/* ── Eval page ──────────────────────────────────────────────── */}
+      {page === "eval" && <EvalPage />}
+
       {/* ── Main grid ──────────────────────────────────────────────── */}
-      <main className="main-grid">
+      <main className="main-grid" style={{ display: page === "eval" ? "none" : undefined }}>
         {/* ── LEFT column ─────────────────────────────────────────── */}
         <div className="left-col">
         {/* ── Upload panel ────────────────────────────────────────── */}
@@ -372,6 +395,30 @@ function App() {
               </button>
             </div>
           )}
+
+          <div className="settings-block">
+            <div className="settings-title">Lane Mask Threshold</div>
+            <div className="setting-row col">
+              <div className="slider-head">
+                <label className="setting-label" htmlFor="lane-thres-slider">
+                  Lane threshold
+                  <span className="setting-hint">Higher value reduces false positives</span>
+                </label>
+                <span className="slider-val">{laneThres.toFixed(2)}</span>
+              </div>
+              <input
+                id="lane-thres-slider"
+                className="slider"
+                type="range"
+                min={0.05}
+                max={0.95}
+                step={0.01}
+                value={laneThres}
+                onChange={(e) => setLaneThres(Number(e.target.value))}
+                style={{ "--val": `${laneThres * 100}%` } as CSSProperties}
+              />
+            </div>
+          </div>
 
           {/* CTA */}
           <button
@@ -667,9 +714,9 @@ function App() {
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="footer">
+      {page !== "eval" && <footer className="footer">
         YOLOPv2 Lane Detection · powered by FastAPI + React
-      </footer>
+      </footer>}
 
       {/* ── Lightbox ───────────────────────────────────────────────── */}
       {lightbox && (

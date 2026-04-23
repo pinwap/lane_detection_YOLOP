@@ -1,0 +1,138 @@
+{
+  "uid": "b18cc4267a",
+  "filename": "test08.jpeg",
+  "processed_at": "2026-04-23T11:41:29.417382+00:00",
+  "upload_url": "/files/uploads/b18cc4267a.jpeg",
+  "result_url": "/files/results/b18cc4267a/result.jpeg",
+  "original_size": {
+    "w": 3024,
+    "h": 4032
+  },
+  "inf_time_ms": 569.84,
+  "nms_time_ms": 9.94,
+  "viz_urls": {
+    "00_original": "/files/results/b18cc4267a/viz/00_original.jpg",
+    "01_work_canvas": "/files/results/b18cc4267a/viz/01_work_canvas.jpg",
+    "02_letterboxed": "/files/results/b18cc4267a/viz/02_letterboxed.jpg",
+    "03_tensor_ch0": "/files/results/b18cc4267a/viz/03_tensor_ch0.jpg",
+    "04_seg_raw": "/files/results/b18cc4267a/viz/04_seg_raw.jpg",
+    "05_ll_raw": "/files/results/b18cc4267a/viz/05_ll_raw.jpg",
+    "06_da_mask": "/files/results/b18cc4267a/viz/06_da_mask.png",
+    "07_ll_mask": "/files/results/b18cc4267a/viz/07_ll_mask.png",
+    "08_da_mask_orig": "/files/results/b18cc4267a/viz/08_da_mask_orig.png",
+    "09_ll_mask_orig": "/files/results/b18cc4267a/viz/09_ll_mask_orig.png",
+    "10_detections_raw": "/files/results/b18cc4267a/viz/10_detections_raw.jpg",
+    "11_overlay_da": "/files/results/b18cc4267a/viz/11_overlay_da.jpg",
+    "12_overlay_ll": "/files/results/b18cc4267a/viz/12_overlay_ll.jpg",
+    "13_overlay_boxes": "/files/results/b18cc4267a/viz/13_overlay_boxes.jpg",
+    "14_final": "/files/results/b18cc4267a/viz/14_final.jpg"
+  },
+  "options": {
+    "lanes_only": true,
+    "visualize": true,
+    "conf_thres": 0.3,
+    "iou_thres": 0.45
+  },
+  "detections": [
+    {
+      "bbox": [
+        0.0,
+        2167.0,
+        0.0,
+        2385.0
+      ],
+      "conf": 0.8628,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        1924.0,
+        0.0,
+        2051.0
+      ],
+      "conf": 0.8412,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        2550.0,
+        2005.0,
+        2755.0,
+        2140.0
+      ],
+      "conf": 0.782,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        1976.0,
+        0.0,
+        2100.0
+      ],
+      "conf": 0.7487,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        1358.0,
+        1981.0,
+        1814.0,
+        2114.0
+      ],
+      "conf": 0.7275,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        1960.0,
+        0.0,
+        2051.0
+      ],
+      "conf": 0.5859,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        487.0,
+        1927.0,
+        671.0,
+        2046.0
+      ],
+      "conf": 0.5621,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        301.0,
+        1947.0,
+        496.0,
+        2040.0
+      ],
+      "conf": 0.5565,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        1928.0,
+        0.0,
+        2001.0
+      ],
+      "conf": 0.518,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        1914.0,
+        0.0,
+        2017.0
+      ],
+      "conf": 0.4859,
+      "cls": 3
+    }
+  ]
+}

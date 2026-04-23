@@ -1,0 +1,68 @@
+{
+  "uid": "fcd600aa08",
+  "filename": "test16.jpeg",
+  "processed_at": "2026-04-23T11:48:38.658767+00:00",
+  "upload_url": "/files/uploads/fcd600aa08.jpeg",
+  "result_url": "/files/results/fcd600aa08/result.jpeg",
+  "original_size": {
+    "w": 3024,
+    "h": 4032
+  },
+  "inf_time_ms": 842.76,
+  "nms_time_ms": 1.16,
+  "viz_urls": {
+    "00_original": "/files/results/fcd600aa08/viz/00_original.jpg",
+    "01_work_canvas": "/files/results/fcd600aa08/viz/01_work_canvas.jpg",
+    "02_letterboxed": "/files/results/fcd600aa08/viz/02_letterboxed.jpg",
+    "03_tensor_ch0": "/files/results/fcd600aa08/viz/03_tensor_ch0.jpg",
+    "04_seg_raw": "/files/results/fcd600aa08/viz/04_seg_raw.jpg",
+    "05_ll_raw": "/files/results/fcd600aa08/viz/05_ll_raw.jpg",
+    "06_da_mask": "/files/results/fcd600aa08/viz/06_da_mask.png",
+    "07_ll_mask": "/files/results/fcd600aa08/viz/07_ll_mask.png",
+    "08_da_mask_orig": "/files/results/fcd600aa08/viz/08_da_mask_orig.png",
+    "09_ll_mask_orig": "/files/results/fcd600aa08/viz/09_ll_mask_orig.png",
+    "10_detections_raw": "/files/results/fcd600aa08/viz/10_detections_raw.jpg",
+    "11_overlay_da": "/files/results/fcd600aa08/viz/11_overlay_da.jpg",
+    "12_overlay_ll": "/files/results/fcd600aa08/viz/12_overlay_ll.jpg",
+    "13_overlay_boxes": "/files/results/fcd600aa08/viz/13_overlay_boxes.jpg",
+    "14_final": "/files/results/fcd600aa08/viz/14_final.jpg"
+  },
+  "options": {
+    "lanes_only": true,
+    "visualize": true,
+    "conf_thres": 0.3,
+    "iou_thres": 0.45
+  },
+  "detections": [
+    {
+      "bbox": [
+        1877.0,
+        2067.0,
+        2646.0,
+        2243.0
+      ],
+      "conf": 0.822,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        2104.0,
+        0.0,
+        2283.0
+      ],
+      "conf": 0.7774,
+      "cls": 3
+    },
+    {
+      "bbox": [
+        0.0,
+        2124.0,
+        0.0,
+        2193.0
+      ],
+      "conf": 0.3723,
+      "cls": 3
+    }
+  ]
+}
